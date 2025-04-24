@@ -1,12 +1,5 @@
 import React from "react";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "./ui/form";
+import { FormControl, FormItem, FormLabel, FormMessage } from "./ui/form";
 import { Input } from "./ui/input";
 import { Control, Controller, FieldValues, Path } from "react-hook-form";
 interface FormFieldProps<T extends FieldValues> {
@@ -30,7 +23,7 @@ interface FormFieldProps<T extends FieldValues> {
     | "time"
     | "color";
 }
-const FormField = ({
+const FormField = <T extends FieldValues>({
   name,
   control,
   label,
@@ -42,11 +35,15 @@ const FormField = ({
     control={control}
     render={({ field }) => (
       <FormItem>
-        <FormLabel className="label" >Username</FormLabel>
+        <FormLabel className="label">{label}</FormLabel>
         <FormControl>
-          <Input  placeholder="Faizi Ahmed" {...field} />
+          <Input
+            className="input"
+            placeholder={placeholder}
+            type={type}
+            {...field}
+          />
         </FormControl>
-        <FormDescription>This is your public display name.</FormDescription>
         <FormMessage />
       </FormItem>
     )}
