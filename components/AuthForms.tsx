@@ -37,8 +37,9 @@ const AuthForms = ({ type }: { type: FormType }) => {
         console.log("Sign In", values);
       }
     } catch (error) {
-      console.error("Error submitting form:", error);
+      console.log("Error submitting form:", error);
       toast.error("Error submitting form");
+
     }
   }
   const isSignIn = type === "sign-in";
@@ -61,7 +62,7 @@ const AuthForms = ({ type }: { type: FormType }) => {
                 name="name"
                 label="Name"
                 placeholder="yourName"
-                
+
               />
             )}
             <FormField
