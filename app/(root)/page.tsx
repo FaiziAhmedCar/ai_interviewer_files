@@ -1,24 +1,24 @@
 import InterviewCard from "@/components/InterviewCard";
 import { Button } from "@/components/ui/button";
-import { dummyInterviews } from "@/constants";
-import { getCurrentUser, getLatestInterviews } from "@/lib/actions/auth.action";
-import { getInterviewsByUserId } from "@/lib/actions/general.action";
+import { getCurrentUser} from "@/lib/actions/auth.action";
+import { getInterviewsByUserId, getLatestInterviews  } from "@/lib/actions/general.action";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
 const page = async () => {
   const user = await getCurrentUser();
-  const [userInterviews, latestInterviews] = await Promise.all([
-    getInterviewsByUserId(user?.id!),
-    getLatestInterviews({ userId: user?.id! }),
+  const [userInterviews , latestInterviews] = await Promise.all([
+    user ? getInterviewsByUserId(user.id) : [],
+    user ? getLatestInterviews({ userId: user.id }) : [],
   ]);
   
-  const hasPastInterviews = userInterviews?.length > 0;
-  const hasUpcomingInterviews = latestInterviews?.length > 0;
+  const hasPastInterviews = (userInterviews??[]).length > 0;
+  const hasUpcomingInterviews =( latestInterviews??[]).length > 0;
 
   return (
     <>
+      
       <section className="card-cta">
         <div className="flex flex-col gap-6 max-w-lg">
           <h2>Get Interview-Ready with AI-Powered Practice & Feedback</h2>

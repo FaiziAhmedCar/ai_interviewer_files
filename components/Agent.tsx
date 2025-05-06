@@ -83,6 +83,7 @@ const Agent = ({
   }, []);
 
   useEffect(() => {
+    
     if (messages.length > 0) {
       setLastMessage(messages[messages.length - 1].content);
     }

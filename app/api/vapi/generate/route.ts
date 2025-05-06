@@ -36,6 +36,7 @@ export async function POST(request: Request) {
     });
 
     const interview = {
+      
       role: role,
       type: type,
       level: level,
