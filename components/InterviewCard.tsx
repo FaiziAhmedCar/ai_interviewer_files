@@ -6,7 +6,7 @@ import Link from "next/link";
 import { getRandomInterviewCover } from "@/lib/utils";
 import DisplayTechIcons from "./DisplayTechIcons";
 
-const InterviewCard = ({
+const InterviewCard = async({
   id,
   userId,
   role,
