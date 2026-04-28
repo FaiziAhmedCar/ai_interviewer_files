@@ -1,17 +1,19 @@
-import Agent from '@/components/Agent';
-import DisplayTechIcons from '@/components/DisplayTechIcons';
-import { getCurrentUser } from '@/lib/actions/auth.action';
-import { getInterviewById } from '@/lib/actions/general.action';
-import { getRandomInterviewCover } from '@/lib/utils';
-import Image from 'next/image';
-import { redirect } from 'next/navigation';
-import React from 'react'
+import Agent from "@/components/Agent";
+import DisplayTechIcons from "@/components/DisplayTechIcons";
+import { getCurrentUser } from "@/lib/actions/auth.action";
+import { getInterviewById } from "@/lib/actions/general.action";
+import { getRandomInterviewCover } from "@/lib/utils";
+import Image from "next/image";
+import { redirect } from "next/navigation";
+import React from "react";
+import type { RouteParams } from "@/types";
 
-const page =async ({params}:RouteParams) => {
-    const {id} =  await params;
-    const interview = await getInterviewById(id);
-    const user = await getCurrentUser();
-    if(!interview) redirect('/')
+const page = async ({ params }: RouteParams) => {
+  const { id } = await params;
+  const interview = await getInterviewById(id);
+  const user = await getCurrentUser();
+  if (!interview) redirect("/");
+  if (!user) redirect("/sign-in");
   return (
     <>
       <div className="flex flex-row gap-4 justify-between">
@@ -36,15 +38,15 @@ const page =async ({params}:RouteParams) => {
       </div>
 
       <Agent
-        userName={user?.name!}
-        userId={user?.id}
+        userName={user.name}
+        userId={user.id}
         interviewId={id}
         type="interview"
         questions={interview.questions}
         // feedbackId={feedback?.id}
       />
     </>
-  )
-}
+  );
+};
 
-export default page
+export default page;

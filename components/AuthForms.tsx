@@ -16,6 +16,7 @@ import {
 } from "firebase/auth";
 import { auth } from "@/firebase/client";
 import { signIn, signUp } from "@/lib/actions/auth.action";
+import type { FormType } from "@/types";
 
 const authFormSchema = (type: FormType) => {
   return z.object({
@@ -44,7 +45,7 @@ const AuthForms = ({ type }: { type: FormType }) => {
         const userCredential = await createUserWithEmailAndPassword(
           auth,
           email,
-          password
+          password,
         );
         const result = await signUp({
           uid: userCredential.user.uid,
@@ -63,7 +64,7 @@ const AuthForms = ({ type }: { type: FormType }) => {
         const userCredential = await signInWithEmailAndPassword(
           auth,
           email,
-          password
+          password,
         );
         const idToken = await userCredential.user.getIdToken();
         if (!idToken) {

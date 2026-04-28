@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { vapi } from "@/lib/vapi.sdk";
 import { interviewer } from "@/constants";
 import { createFeedback } from "@/lib/actions/general.action";
+import type { AgentProps } from "@/types";
 
 enum CallStatus {
   INACTIVE = "INACTIVE",
@@ -61,8 +62,20 @@ const Agent = ({
       setIsSpeaking(false);
     };
 
-    const onError = (error: Error) => {
-      console.log("Error:", error);
+    const onError = (error: any) => {
+      console.error("Vapi Error Details:", {
+        message: error.message,
+        error: error,
+        stringified: JSON.stringify(error),
+      });
+      // Handle ejection errors gracefully
+      if (
+        error.message?.includes("ejection") ||
+        error.message?.includes("ended") ||
+        error.message?.includes("forbidden")
+      ) {
+        setCallStatus(CallStatus.FINISHED);
+      }
     };
 
     vapi.on("call-start", onCallStart);
@@ -83,7 +96,6 @@ const Agent = ({
   }, []);
 
   useEffect(() => {
-    
     if (messages.length > 0) {
       setLastMessage(messages[messages.length - 1].content);
     }
@@ -116,13 +128,17 @@ const Agent = ({
   }, [messages, callStatus, feedbackId, interviewId, router, type, userId]);
 
   const handleCall = async () => {
+    console.log("Starting call with userName:", userName);
     setCallStatus(CallStatus.CONNECTING);
 
     if (type === "generate") {
       await vapi.start(process.env.NEXT_PUBLIC_VAPI_WORKFLOW_ID!, {
         variableValues: {
           username: userName,
+          userName: userName,
+          name: userName,
           userid: userId,
+          userId: userId,
         },
       });
     } else {
@@ -135,6 +151,8 @@ const Agent = ({
 
       await vapi.start(interviewer, {
         variableValues: {
+          name: userName,
+          userName: userName,
           questions: formattedQuestions,
         },
       });
@@ -186,7 +204,7 @@ const Agent = ({
               key={lastMessage}
               className={cn(
                 "transition-opacity duration-500 opacity-0",
-                "animate-fadeIn opacity-100"
+                "animate-fadeIn opacity-100",
               )}
             >
               {lastMessage}
@@ -201,7 +219,7 @@ const Agent = ({
             <span
               className={cn(
                 "absolute animate-ping rounded-full opacity-75",
-                callStatus !== "CONNECTING" && "hidden"
+                callStatus !== "CONNECTING" && "hidden",
               )}
             />
 
