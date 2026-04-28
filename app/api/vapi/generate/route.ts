@@ -33,7 +33,7 @@ export async function POST(request: Request) {
     if (typeof args === "string") {
       try {
         args = JSON.parse(args);
-      } catch (_e) {
+      } catch {
         console.error("Failed to parse arguments string:", args);
       }
     }
