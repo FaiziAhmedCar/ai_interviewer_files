@@ -1,7 +1,12 @@
 import { generateText } from "ai";
-import { google } from "@ai-sdk/google";
+import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { getRandomInterviewCover } from "@/lib/utils";
 import { db } from "@/firebase/admin";
+
+const google = createGoogleGenerativeAI({
+  apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
+});
+
 export async function GET() {
   return Response.json(
     { success: true, data: "Hello from VAPI" },
@@ -12,14 +17,33 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    console.log("Vapi Tool Call Body:", body);
+    console.log("Vapi Tool Call Body:", JSON.stringify(body, null, 2));
 
-    const { type, role, level, techstack, amount, userid } = body.message?.toolCalls?.[0]?.function?.arguments || body;
+    if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
+      console.error("GOOGLE_GENERATIVE_AI_API_KEY is not set in environment variables");
+      return Response.json(
+        { success: false, error: "AI Configuration error" },
+        { status: 500 }
+      );
+    }
+
+    let args = body.message?.toolCalls?.[0]?.function?.arguments || body;
+    
+    // Handle stringified arguments if necessary
+    if (typeof args === "string") {
+      try {
+        args = JSON.parse(args);
+      } catch (e) {
+        console.error("Failed to parse arguments string:", args);
+      }
+    }
+
+    const { type, role, level, techstack, amount, userid } = args;
 
     if (!role || !type || !level || !userid || !amount) {
-      console.error("Missing fields:", { role, type, level, userid, amount });
+      console.error("Missing fields in args:", { role, type, level, userid, amount });
       return Response.json(
-        { success: false, error: "Missing required fields" },
+        { success: false, error: "Missing required fields", received: { role, type, level, userid, amount } },
         { status: 400 }
       );
     }
