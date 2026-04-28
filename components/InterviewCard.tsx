@@ -1,15 +1,13 @@
 import React from "react";
-import dayjs from "dayjs";
 import Image from "next/image";
 import { Button } from "./ui/button";
 import Link from "next/link";
 import { getRandomInterviewCover } from "@/lib/utils";
 import DisplayTechIcons from "./DisplayTechIcons";
-import {
-  getFeedbackByInterviewId,
-} from "@/lib/actions/general.action";
+import { getFeedbackByInterviewId } from "@/lib/actions/general.action";
+import type { InterviewCardProps } from "@/types";
 
-const InterviewCard = async({
+const InterviewCard = async ({
   id,
   userId,
   role,
@@ -22,9 +20,16 @@ const InterviewCard = async({
     userId,
   });
   const normalizedType = /mix/gi.test(type) ? "Mixed" : type;
-  const formattedDate = dayjs(
-    feedback?.createdAt || createdAt || Date.now()
-  ).format("DD MMM YYYY");
+  const formatDate = (dateString: string | undefined) => {
+    if (!dateString) return "No date";
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+  };
+  const formattedDate = formatDate(feedback?.createdAt || createdAt);
   return (
     <div className="card-border w-[360px] max-sm:w-full min-h-96 ">
       <div className="card-interview">
@@ -64,11 +69,7 @@ const InterviewCard = async({
           <DisplayTechIcons techStack={techstack} />
           <Button className="btn-primary">
             <Link
-              href={
-                feedback
-                  ? `/interview/${id}/feedback`
-                  : `/interview/${id}`
-              }
+              href={feedback ? `/interview/${id}/feedback` : `/interview/${id}`}
             >
               {feedback ? "Check Feedback" : "View Interview"}
             </Link>

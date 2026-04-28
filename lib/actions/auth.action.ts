@@ -3,6 +3,7 @@
 import { auth, db } from "@/firebase/admin";
 import { cookies } from "next/headers";
 import { toast } from "sonner";
+import type { SignUpParams, SignInParams, User } from "@/types";
 
 const OneWeek = 60 * 60 * 24 * 7; // 7 days
 export async function signUp(params: SignUpParams) {
@@ -28,7 +29,7 @@ export async function signUp(params: SignUpParams) {
     console.error("Error signing up:", error);
     if (error === "auth/email-already-in-use") {
       toast.error(
-        "This email is already in use. Please try another one or log in."
+        "This email is already in use. Please try another one or log in.",
       );
       return {
         success: false,
@@ -78,7 +79,7 @@ export async function setSessionCookie(idToken: string) {
   });
 }
 
-export async function getCurrentUser() :Promise<User | null> {
+export async function getCurrentUser(): Promise<User | null> {
   const cookieStore = await cookies();
   const sessionCookie = cookieStore.get("session")?.value;
   if (!sessionCookie) {
@@ -86,11 +87,14 @@ export async function getCurrentUser() :Promise<User | null> {
   }
   try {
     const decodedClaims = await auth.verifySessionCookie(sessionCookie, true);
-    const userRecord = await db.collection("users").doc(decodedClaims.uid).get();
+    const userRecord = await db
+      .collection("users")
+      .doc(decodedClaims.uid)
+      .get();
     if (!userRecord.exists) {
       return null;
     }
-    return{
+    return {
       ...userRecord.data(),
       id: userRecord.id,
     } as User;
@@ -103,4 +107,9 @@ export async function getCurrentUser() :Promise<User | null> {
 export async function isAuthenticated() {
   const user = await getCurrentUser();
   return !!user;
+}
+
+export async function signOut() {
+  const cookieStore = await cookies();
+  cookieStore.delete("session");
 }
