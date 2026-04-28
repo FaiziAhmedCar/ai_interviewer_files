@@ -48,7 +48,7 @@ export async function POST(request: Request) {
     let questions;
     try {
       questions = JSON.parse(cleanedResponse);
-    } catch (_parseError) {
+    } catch {
       console.error("Failed to parse Gemini response:", cleanedResponse);
       throw new Error("Invalid format returned from AI model");
     }
