@@ -62,17 +62,18 @@ const Agent = ({
       setIsSpeaking(false);
     };
 
-    const onError = (error: any) => {
+    const onError = (error: unknown) => {
+      const vapiError = error as { message?: string };
       console.error("Vapi Error Details:", {
-        message: error.message,
+        message: vapiError.message,
         error: error,
         stringified: JSON.stringify(error),
       });
       // Handle ejection errors gracefully
       if (
-        error.message?.includes("ejection") ||
-        error.message?.includes("ended") ||
-        error.message?.includes("forbidden")
+        vapiError.message?.includes("ejection") ||
+        vapiError.message?.includes("ended") ||
+        vapiError.message?.includes("forbidden")
       ) {
         setCallStatus(CallStatus.FINISHED);
       }

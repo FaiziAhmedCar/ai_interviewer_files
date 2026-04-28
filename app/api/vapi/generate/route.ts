@@ -48,7 +48,7 @@ export async function POST(request: Request) {
     let questions;
     try {
       questions = JSON.parse(cleanedResponse);
-    } catch (parseError) {
+    } catch (_parseError) {
       console.error("Failed to parse Gemini response:", cleanedResponse);
       throw new Error("Invalid format returned from AI model");
     }
@@ -74,8 +74,12 @@ export async function POST(request: Request) {
         result: "Interview generated and saved successfully. You can now tell the user that the interview is ready and they should go to the dashboard."
       }]
     }, { status: 200 });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const err = error as { message?: string };
     console.error("Generation Error:", error);
-    return Response.json({ success: false, error: error.message || "Internal Server Error" }, { status: 500 });
+    return Response.json(
+      { success: false, error: err.message || "Internal Server Error" },
+      { status: 500 },
+    );
   }
 }
